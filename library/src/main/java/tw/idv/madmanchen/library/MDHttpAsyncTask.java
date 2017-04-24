@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.IntDef;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -16,6 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,7 +59,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
     // Http POST 的資料 Map
     private HashMap<String, String> mPostData;
     // 所要回傳的類型
-    private Type mType;
+    private int mType;
     // 下載檔案的路徑
     private String mDownloadPath;
     // 讀取視窗
@@ -64,7 +67,6 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
     // 是否顯示讀取視窗
     private boolean mIsShowLoadingView;
     private static AtomicBoolean mIsShowingLoadingView = new AtomicBoolean(false);
-
     // 是否可取消下載
     private boolean mCancelable;
     // 是否覆寫存在的檔案
@@ -75,11 +77,15 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         void onResponse(Object data);
     }
 
-    // 回傳類型的 Enum
-    public enum Type {
-        TEXT, TEXT_ARRAY,
-        FILE, FILE_ARRAY,
-        UPLOAD_FILE,
+    public static final int TEXT = 0;
+    public static final int TEXT_ARRAY = 1;
+    public static final int FILE = 2;
+    public static final int FILE_ARRAY = 3;
+    public static final int UPLOAD_FILE = 4;
+
+    @IntDef({TEXT, TEXT_ARRAY, FILE, FILE_ARRAY, UPLOAD_FILE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Type {
     }
 
     // Http form data 表單格式
@@ -115,6 +121,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         mOverWrite = builder.mOverWrite;
         mUploadFileList = builder.mUploadFileList;
         mLoadingView = builder.mLoadingView;
+//        Toast
     }
 
     /**
@@ -226,7 +233,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
     private void showLoadingView(final MDHttpAsyncTask task) {
         if (!mIsShowingLoadingView.get()) {
             if (mIsShowLoadingView && mLoadingView != null && !mLoadingView.isShowing()) {
-                if (mType == Type.FILE || mType == Type.FILE_ARRAY) {
+                if (mType == FILE || mType == FILE_ARRAY) {
                     mLoadingView.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                     mLoadingView.setProgressNumberFormat("%dKB/%dKB");
                     if (mCancelable) {
@@ -499,7 +506,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         private int mConnTimeout;
         private List<SubResponse> mSubResponseList;
         private HashMap<String, String> mPostData;
-        private Type mType;
+        private int mType;
         private String mDownloadPath;
         private boolean mIsShowLoadingView;
         private boolean mCancelable;
@@ -517,7 +524,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
             mConnTimeout = 20_000;
             mSubResponseList = new ArrayList<>();
             mPostData = new HashMap<>();
-            mType = Type.TEXT;
+            mType = TEXT;
             mDownloadPath = Environment.getExternalStorageDirectory() + "/" + Environment.DIRECTORY_DOWNLOADS;
             mIsShowLoadingView = false;
             mCancelable = false;
@@ -601,7 +608,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
          * @param type 回傳類型 Enum
          * @return Builder
          */
-        public Builder setRequestType(Type type) {
+        public Builder setRequestType(@Type int type) {
             mType = type;
             return this;
         }
