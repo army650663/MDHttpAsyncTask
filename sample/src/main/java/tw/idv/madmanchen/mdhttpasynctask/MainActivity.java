@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         new MDHttpAsyncTask.Builder()
                 .load("http://pub.mysoqi.com/isoqi_us/?acc=A161779&psd=08278023&usr_type=agent")
-                .setRequestType(MDHttpAsyncTask.TEXT)
+                .setRequestType(MDHttpAsyncTask.TEXT_ARRAY)
                 .build()
                 .startAll(new MDHttpAsyncTask.SubResponse() {
                     @Override
