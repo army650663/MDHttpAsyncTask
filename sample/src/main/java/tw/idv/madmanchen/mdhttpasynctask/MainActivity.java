@@ -3,7 +3,7 @@ package tw.idv.madmanchen.mdhttpasynctask;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
+import android.util.Log;
 
 import tw.idv.madmanchen.library.MDHttpAsyncTask;
 
@@ -15,13 +15,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
         new MDHttpAsyncTask.Builder()
-                .load("http://pub.mysoqi.com/isoqi_us/?acc=A161779&psd=08278023&usr_type=agent")
-                .setRequestType(MDHttpAsyncTask.TEXT_ARRAY)
+                .load("http://pub.mysoqi.com/ht_agent/060/")
+                .addPostData("acc", "T221142968")
+                .addPostData("psd", "1123")
                 .build()
                 .startAll(new MDHttpAsyncTask.SubResponse() {
                     @Override
                     public void onResponse(Object data) {
-                        Toast.makeText(mContext, data.toString(), Toast.LENGTH_SHORT).show();
+                        Log.e("data", data.toString());
                     }
                 });
     }

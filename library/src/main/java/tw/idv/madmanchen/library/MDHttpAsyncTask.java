@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -224,6 +225,20 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         mSubResponseList.add(subResponse);
         executeOnExecutor(EXECUTOR_SERVICE, mUrls);
     }
+
+    public Object getResult(boolean inPool) {
+        try {
+            if (inPool) {
+                return executeOnExecutor(EXECUTOR_SERVICE, mUrls).get();
+            } else {
+                return execute(mUrls).get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     /**
      * 顯示讀取視窗
