@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import tw.idv.madmanchen.library.MDHttpAsyncTask;
+import tw.idv.madmanchen.mdhttpasynctasklib.MDHttpAsyncTask;
 
 public class MainActivity extends AppCompatActivity {
     private Context mContext;
