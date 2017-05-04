@@ -122,7 +122,6 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         mOverWrite = builder.mOverWrite;
         mUploadFileList = builder.mUploadFileList;
         mLoadingView = builder.mLoadingView;
-//        Toast
     }
 
     /**
@@ -151,53 +150,59 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
                         mURLConnection.setDoInput(true);
                         mURLConnection.setDoOutput(true);
                         mURLConnection.setChunkedStreamingMode(0);
-                        mURLConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
-                        String fContentDisposition = "Content-Disposition: form-data; name=\"%s\"";
-                        String fContentType = "Content-Type: %s";
-                        try {
-                            DataOutputStream dos = new DataOutputStream(mURLConnection.getOutputStream());
+                        if (mType == UPLOAD_FILE) {
+                            mURLConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
+                            String fContentDisposition = "Content-Disposition: form-data; name=\"%s\"";
+                            String fContentType = "Content-Type: %s";
+                            try {
+                                DataOutputStream dos = new DataOutputStream(mURLConnection.getOutputStream());
 
-                            // 將檔案寫入 Http form data
-                            for (int i = 0; i < mUploadFileList.size(); i++) {
-                                File file = mUploadFileList.get(i);
-                                String fileName = file.getName();
-                                String mimeType = HttpURLConnection.guessContentTypeFromName(fileName);
-                                String contentDisposition = String.format(fContentDisposition, "file" + i) + "; filename=\"" + fileName + "\"";
-                                String contentType = String.format(fContentType, mimeType);
-                                dos.writeBytes(HYPHENS + BOUNDARY + CRLF);
-                                dos.writeBytes(contentDisposition + CRLF);
-                                dos.writeBytes(contentType + CRLF);
-                                dos.writeBytes(CRLF);
-
-                                FileInputStream fis = new FileInputStream(file);
-                                byte[] buffer = new byte[2048];
-                                int bufferLength;
-                                while ((bufferLength = fis.read(buffer)) > 0) {
-                                    dos.write(buffer, 0, bufferLength);
-                                }
-                                fis.close();
-                                dos.writeBytes(CRLF);
-                            }
-
-                            // 將參數寫入 Http form data
-                            if (mPostData != null) {
-                                for (Map.Entry<String, String> entry : mPostData.entrySet()) {
-                                    String contentDisposition = String.format(fContentDisposition, entry.getKey());
+                                // 將檔案寫入 Http form data
+                                for (int i = 0; i < mUploadFileList.size(); i++) {
+                                    File file = mUploadFileList.get(i);
+                                    String fileName = file.getName();
+                                    String mimeType = HttpURLConnection.guessContentTypeFromName(fileName);
+                                    String contentDisposition = String.format(fContentDisposition, "file" + i) + "; filename=\"" + fileName + "\"";
+                                    String contentType = String.format(fContentType, mimeType);
                                     dos.writeBytes(HYPHENS + BOUNDARY + CRLF);
                                     dos.writeBytes(contentDisposition + CRLF);
-                                    dos.writeBytes("Content-Type: text/plain" + CRLF);
+                                    dos.writeBytes(contentType + CRLF);
                                     dos.writeBytes(CRLF);
-                                    dos.writeBytes(entry.getValue());
+
+                                    FileInputStream fis = new FileInputStream(file);
+                                    byte[] buffer = new byte[2048];
+                                    int bufferLength;
+                                    while ((bufferLength = fis.read(buffer)) > 0) {
+                                        dos.write(buffer, 0, bufferLength);
+                                    }
+                                    fis.close();
                                     dos.writeBytes(CRLF);
                                 }
+
+                                // 將參數寫入 Http form data
+                                if (mPostData != null) {
+                                    for (Map.Entry<String, String> entry : mPostData.entrySet()) {
+                                        String contentDisposition = String.format(fContentDisposition, entry.getKey());
+                                        dos.writeBytes(HYPHENS + BOUNDARY + CRLF);
+                                        dos.writeBytes(contentDisposition + CRLF);
+                                        dos.writeBytes("Content-Type: text/plain" + CRLF);
+                                        dos.writeBytes(CRLF);
+                                        dos.writeBytes(entry.getValue());
+                                        dos.writeBytes(CRLF);
+                                    }
+                                }
+                                dos.writeBytes(HYPHENS + BOUNDARY + HYPHENS);
+                                dos.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                            dos.writeBytes(HYPHENS + BOUNDARY + HYPHENS);
-                            dos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } else {
+                            if (mPostData != null) {
+                                DataOutputStream dos = new DataOutputStream(mURLConnection.getOutputStream());
+                                dos.write(mapToPostData(mPostData).getBytes());
+                                dos.close();
+                            }
                         }
-                        break;
-                    default:
                         break;
                 }
             } catch (IOException e) {
@@ -485,7 +490,6 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
             case UPLOAD_FILE:
                 return uploadFiles(urls[0]);
         }
-
         return null;
     }
 
@@ -725,6 +729,18 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         public MDHttpAsyncTask build() {
             return new MDHttpAsyncTask(this);
         }
+    }
+
+    private String mapToPostData(HashMap<String, String> postData) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<String, String> entry : postData.entrySet()) {
+            stringBuilder.append(entry.getKey());
+            stringBuilder.append("=");
+            stringBuilder.append(entry.getValue());
+            stringBuilder.append("&");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
 }
