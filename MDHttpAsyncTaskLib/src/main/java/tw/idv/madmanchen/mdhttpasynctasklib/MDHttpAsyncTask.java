@@ -231,9 +231,9 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
         executeOnExecutor(EXECUTOR_SERVICE, mUrls);
     }
 
-    public Object getResult(boolean inPool) {
+    public Object getResult(boolean inThreadPool) {
         try {
-            if (inPool) {
+            if (inThreadPool) {
                 return executeOnExecutor(EXECUTOR_SERVICE, mUrls).get();
             } else {
                 return execute(mUrls).get();
@@ -332,6 +332,7 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                cancel(true);
             } finally {
                 mURLConnection.disconnect();
             }

@@ -2,10 +2,12 @@ package tw.idv.madmanchen.mdhttpasynctask;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import tw.idv.madmanchen.mdhttpasynctasklib.MDHttpAsyncTask;
 
@@ -16,27 +18,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
+        syncNum();
 
-        HashMap<String, String> params = new HashMap<>();
-        params.put("acc", "MADMANCHEN");
-        params.put("psd", "Codeing");
-        params.put("page", "searchagent");
-        params.put("act", "searchagent_getdata");
-        params.put("country", "TW");
-        params.put("id", "張瑞蘭");
-        params.put("addr", "");
-        params.put("state", "");
-        Log.e("search", params.toString());
+    }
+
+    private void syncNum() {
+        final String[] urls = {
+                "http://www.xingmerit.com.cn/newmtagent/mobile.php?acc=" + "MADMANCHEN" + "&psd=" + "Codeing" + "&po=mainpage&op=total_form",
+                "http://eip.hsinten.com.tw/web_official/mobile.php?acc=" + "MADMANCHEN" + "&psd=" + "Codeing" + "&po=mainpage&op=total_doc"
+        };
         new MDHttpAsyncTask.Builder()
-                .load("http://pub.mysoqi.com/ht_analy/0028/")
-                .setLoadingView(mContext, "", "")
-                .addPostData(params)
+                .load(urls)
+                .setRequestType(MDHttpAsyncTask.TEXT_ARRAY)
                 .build()
                 .startAll(new MDHttpAsyncTask.SubResponse() {
                     @Override
                     public void onResponse(Object data) {
                         if (data != null) {
-                            Log.e("data", data.toString());
+                            String[] dataArr = (String[]) data;
+                            try {
+                                if (dataArr[0] != null) {
+                                    JSONObject hmJObj = new JSONObject(dataArr[0]);
+                                    int hmNum = hmJObj.optInt("totalnum", 0);
+                                    Log.e("hmNum", hmNum + "");
+
+                                }
+
+                                if (dataArr[1] != null) {
+                                    JSONObject docJObj = new JSONObject(dataArr[1]);
+                                    int docNum = docJObj.optInt("totalnum", 0);
+                                    Log.e("docNum", docNum + "");
+                                }
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        syncNum();
+                                    }
+                                }, 6000);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
