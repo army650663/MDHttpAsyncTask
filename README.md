@@ -25,6 +25,7 @@ dependencies {
  new MDHttpAsyncTask.Builder()
                  .load(url)
                  .setRequestType(MDHttpAsyncTask.TEXT)
+                 .setLoadingView(mContext, "", "Loading")
                  .build()
                  .startAll(new MDHttpAsyncTask.SubResponse() {
                      @Override
@@ -35,3 +36,40 @@ dependencies {
                      }
                  });
  ```
+ 
+ - 下載檔案
+  ``` java
+  new MDHttpAsyncTask.Builder()
+                  .load(url)
+                  .setRequestType(MDHttpAsyncTask.FILE)
+                  .setLoadingView(mContext, "", "")
+                  .setDownloadPath(PATH)
+                  .build()
+                  .startAll(new MDHttpAsyncTask.SubResponse() {
+                      @Override
+                      public void onResponse(Object data) {
+                          if (data != null) {
+                              
+                          }
+                      }
+                  });
+  ```
+  
+ - 上傳檔案
+  ``` java
+  new MDHttpAsyncTask.Builder()
+                  .load(url)
+                  .setRequestType(MDHttpAsyncTask.FILE)
+                  .setLoadingView(mContext, "", "")
+                  .setRequestType(MDHttpAsyncTask.UPLOAD_FILE)
+                  .addUploadFile(Files)
+                  .build()
+                  .startAll(new MDHttpAsyncTask.SubResponse() {
+                      @Override
+                      public void onResponse(Object data) {
+                          if (data != null) {
+                              
+                          }
+                      }
+                  });
+  ```

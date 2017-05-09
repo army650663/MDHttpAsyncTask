@@ -23,13 +23,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void syncNum() {
-        final String[] urls = {
-                "http://www.xingmerit.com.cn/newmtagent/mobile.php?acc=" + "MADMANCHEN" + "&psd=" + "Codeing" + "&po=mainpage&op=total_form",
-                "http://eip.hsinten.com.tw/web_official/mobile.php?acc=" + "MADMANCHEN" + "&psd=" + "Codeing" + "&po=mainpage&op=total_doc"
-        };
         new MDHttpAsyncTask.Builder()
                 .load(urls)
-                .setRequestType(MDHttpAsyncTask.TEXT_ARRAY)
+                .setLoadingView(mContext, "", "Loading")
+                .setRequestType(MDHttpAsyncTask.UPLOAD_FILE)
+                .addUploadFile(Files)
                 .build()
                 .startAll(new MDHttpAsyncTask.SubResponse() {
                     @Override
