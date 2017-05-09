@@ -59,7 +59,6 @@ dependencies {
   ``` java
   new MDHttpAsyncTask.Builder()
                   .load(url)
-                  .setRequestType(MDHttpAsyncTask.FILE)
                   .setLoadingView(mContext, "", "")
                   .setRequestType(MDHttpAsyncTask.UPLOAD_FILE)
                   .addUploadFile(Files)
