@@ -1,6 +1,5 @@
 # MDHttpAsyncTask
-使用
------
+## 使用
 **1. Gradle dependency** (recommended)
 
   -  Add the following to your project level `build.gradle`:
@@ -20,7 +19,8 @@ dependencies {
 }
 ```
 #### 範例
- - 取得字串回傳
+**取得字串回傳**
+ 
  ``` java
  new MDHttpAsyncTask.Builder()
                  .load(url)
@@ -35,9 +35,8 @@ dependencies {
                          }
                      }
                  });
- ```
- 
- - 下載檔案
+ ``` 
+##### 下載檔案
   ``` java
   new MDHttpAsyncTask.Builder()
                   .load(url)
@@ -55,7 +54,7 @@ dependencies {
                   });
   ```
   
- - 上傳檔案
+#####  - 上傳檔案
   ``` java
   new MDHttpAsyncTask.Builder()
                   .load(url)
@@ -72,3 +71,4 @@ dependencies {
                       }
                   });
   ```
+
