@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -43,6 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
+    public static final String TAG = "MDHttpAsyncTaskU";
     // 用於 UI Thread
     private Handler mHandler = new Handler();
     // 請求的 URL 陣列
@@ -62,7 +64,7 @@ public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
     // 所要回傳的類型
     private int mType = TEXT;
     // 下載檔案的路徑
-    private String mDownloadPath;
+    private String mDownloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
     // 讀取視窗
     private ProgressDialog mLoadingView;
     // 是否顯示讀取視窗
@@ -81,8 +83,7 @@ public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
 
     @IntDef({TEXT, TEXT_ARRAY, FILE, FILE_ARRAY, UPLOAD_FILE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Type {
-    }
+    public @interface Type {}
 
     // Http form data 表單格式
     private static final String BOUNDARY = "==================================";
@@ -252,6 +253,7 @@ public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
      */
     public MDHttpAsyncTaskU addUploadFile(File... files) {
         mMethod = "POST";
+        mType = UPLOAD_FILE;
         Collections.addAll(mUploadFileList, files);
         return this;
     }
@@ -264,6 +266,7 @@ public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
      */
     public MDHttpAsyncTaskU addUploadFile(List<File> fileList) {
         mMethod = "POST";
+        mType = UPLOAD_FILE;
         for (File file : fileList) {
             mUploadFileList.add(file);
         }
@@ -362,7 +365,7 @@ public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
      *
      * @param subResponse 結果回傳介面
      */
-    public void start(SubResponse subResponse, boolean inThreadPool) {
+    public void start(boolean inThreadPool, SubResponse subResponse) {
         mSubResponse = subResponse;
         if (inThreadPool) {
             executeOnExecutor(EXECUTOR_SERVICE, mUrls);
@@ -668,13 +671,16 @@ public final class MDHttpAsyncTaskU extends AsyncTask<String, Number, Object> {
 
     private String mapToPostData(Map<String, String> postData) {
         StringBuilder stringBuilder = new StringBuilder();
+        int count = 0;
         for (Map.Entry<String, String> entry : postData.entrySet()) {
+            if (count > 0) {
+                stringBuilder.append("&");
+            }
             stringBuilder.append(entry.getKey());
             stringBuilder.append("=");
             stringBuilder.append(entry.getValue());
-            stringBuilder.append("&");
+            count++;
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         return stringBuilder.toString();
     }
 
