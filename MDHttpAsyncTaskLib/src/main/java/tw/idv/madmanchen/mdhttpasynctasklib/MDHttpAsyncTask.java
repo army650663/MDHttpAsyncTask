@@ -149,7 +149,6 @@ public final class MDHttpAsyncTask extends AsyncTask<String, Number, Object> {
                     case "POST":
                         mURLConnection.setDoInput(true);
                         mURLConnection.setDoOutput(true);
-//                        mURLConnection.setChunkedStreamingMode(0);
                         if (mType == UPLOAD_FILE) {
                             mURLConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
                             String fContentDisposition = "Content-Disposition: form-data; name=\"%s\"";
